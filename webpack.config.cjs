@@ -15,6 +15,9 @@ module.exports = {
   resolve: {
     // 这里要把 .ts / .tsx 加进去
     extensions: [".ts", ".tsx", ".js", ".jsx"],
+    alias: {
+      "@": path.resolve(__dirname, "src"),
+    },
   },
   module: {
     rules: [
