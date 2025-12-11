@@ -1,9 +1,9 @@
-import { GalaxyWithControls } from "@/features/galaxy/components/GalaxyWithControls";
+import { BlockVisualizer } from "@/features/block-visualizer/index";
 
 function App() {
   return (
     <div className="w-full h-screen">
-      <GalaxyWithControls />
+      <BlockVisualizer />
     </div>
   );
 }

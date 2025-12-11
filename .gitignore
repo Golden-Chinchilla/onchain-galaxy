@@ -55,4 +55,5 @@ tsconfig.tsbuildinfo
 .idea/
 *.swp
 *.swo
-
+*.dev.md
+test/

@@ -1,4 +1,5 @@
-// webpack.config.cjs
+require("dotenv").config();
+const webpack = require("webpack");
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
@@ -13,7 +14,6 @@ module.exports = {
   },
   devtool: "source-map",
   resolve: {
-    // 这里要把 .ts / .tsx 加进去
     extensions: [".ts", ".tsx", ".js", ".jsx"],
     alias: {
       "@": path.resolve(__dirname, "src"),
@@ -21,7 +21,6 @@ module.exports = {
   },
   module: {
     rules: [
-      // JS / TS / JSX / TSX
       {
         test: /\.[jt]sx?$/,
         exclude: /node_modules/,
@@ -41,7 +40,6 @@ module.exports = {
           "postcss-loader",
         ],
       },
-      // 贴图资源
       {
         test: /\.(png|jpe?g|gif|svg)$/i,
         type: "asset",
@@ -51,6 +49,11 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "public/index.html"),
+    }),
+    new webpack.DefinePlugin({
+      "process.env.ETH_MAINNET_RPC_URL": JSON.stringify(
+        process.env.ETH_MAINNET_RPC_URL
+      ),
     }),
   ],
   devServer: {
