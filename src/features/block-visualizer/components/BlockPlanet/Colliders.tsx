@@ -1,14 +1,13 @@
 ﻿import React from "react";
-import type { PlanetConfig } from "../../types";
+import type { BasePlanetLayerProps } from "./types";
 
-// 暂时只是一个占位，用于未来做点击/hover 检测的 “包围体”
-interface CollidersProps {
-  config: PlanetConfig;
+interface CollidersProps extends BasePlanetLayerProps {
   onClickPlanet?: () => void;
 }
 
 export const Colliders: React.FC<CollidersProps> = ({
   config,
+  quality,
   onClickPlanet,
 }) => {
   return (

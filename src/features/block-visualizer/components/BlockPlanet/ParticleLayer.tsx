@@ -1,21 +1,23 @@
 ﻿import React from "react";
-import { Sparkles } from "@react-three/drei";
-import type { PlanetConfig } from "../../types";
+import type { BasePlanetLayerProps } from "./types";
+import { SparklesParticleSystem } from "./particles/SparklesParticleSystem";
 
-interface ParticleLayerProps {
-  config: PlanetConfig;
-}
+interface ParticleLayerProps extends BasePlanetLayerProps {}
 
-export const ParticleLayer: React.FC<ParticleLayerProps> = ({ config }) => {
+export const ParticleLayer: React.FC<ParticleLayerProps> = ({
+  config,
+  quality = "high",
+}) => {
+  // 👉 以后 quality 会在这里决定使用哪种粒子系统
+  // const systemType = quality === "high" ? "gpu" : "sparkles";
+
+  const color = config.era === "pos" ? "#38bdf8" : "#f97316";
+
   return (
-    <Sparkles
+    <SparklesParticleSystem
       count={config.particles.count}
-      size={config.particles.size}
-      speed={0.6}
-      opacity={0.7}
-      noise={2}
-      color={config.era === "pos" ? "#38bdf8" : "#f97316"}
-      scale={config.particles.spreadRadius}
+      radius={config.particles.spreadRadius}
+      color={color}
     />
   );
 };

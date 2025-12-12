@@ -1,11 +1,9 @@
 ﻿import React, { useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
-import type { PlanetConfig } from "../../types";
 import { Group } from "three";
+import type { BasePlanetLayerProps } from "./types";
 
-interface SatelliteLayerProps {
-  config: PlanetConfig;
-}
+interface SatelliteLayerProps extends BasePlanetLayerProps {}
 
 export const SatelliteLayer: React.FC<SatelliteLayerProps> = ({ config }) => {
   const groupRef = React.useRef<Group>(null);

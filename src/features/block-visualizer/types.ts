@@ -17,6 +17,8 @@ export interface BlockBasic {
 
 // 区块 → 星球可视化配置
 export interface PlanetConfig {
+  visualSeed: number;
+
   radius: number;
   coreColor: string;
   surfaceColor: string;

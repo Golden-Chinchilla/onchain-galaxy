@@ -7,8 +7,20 @@ function normalizeBigint(value: bigint | undefined, max: bigint): number {
   return Number(v) / Number(max);
 }
 
+function hashToSeed(hash: string): number {
+  // 32bit FNV-like hash，稳定、够用
+  let h = 2166136261;
+  for (let i = 0; i < hash.length; i++) {
+    h ^= hash.charCodeAt(i);
+    h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+  }
+  // 映射到 0 ~ 1000 的 float
+  return (h >>> 0) / 0xffffffff;
+}
+
 // 区块 → 星球配置 映射函数
 export function mapBlockToPlanetConfig(block: BlockBasic): PlanetConfig {
+  const visualSeed = hashToSeed(block.hash);
   const txFactor = Math.min(block.txCount / 200, 1); // 0~1
   const gasFactor = normalizeBigint(
     block.gasUsed,
@@ -21,6 +33,7 @@ export function mapBlockToPlanetConfig(block: BlockBasic): PlanetConfig {
   const radius = 1.8 + sizeFactor * 1.2;
 
   return {
+    visualSeed,
     radius,
     coreColor: isPos ? "#5df2ff" : "#ffb347",
     surfaceColor: isPos ? "#0f172a" : "#3b1f0f",
