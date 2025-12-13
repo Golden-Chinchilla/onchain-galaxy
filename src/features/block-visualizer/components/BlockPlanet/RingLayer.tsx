@@ -12,18 +12,40 @@ export const RingLayer: React.FC<RingLayerProps> = ({
 }) => {
   const q = useQuality(quality);
   const meshRef = useRef<THREE.Mesh | null>(null);
-  const matRef = useRef<any>(null);
+  const materialRef = useRef<THREE.ShaderMaterial | null>(null);
 
+  const seed = (config as any).visualSeed ?? 0;
   const color = useMemo(
     () => new THREE.Color(config.ring.color),
     [config.ring.color]
   );
-  const seed = (config as any).visualSeed ?? 0;
+
+  const material = useMemo(() => {
+    const mat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uSeed: { value: seed },
+        uColor: { value: color },
+        uIntensity: { value: 0.7 },
+        uBandFreq: { value: quality === "high" ? 56.0 : 42.0 },
+        uGrainStrength: { value: quality === "high" ? 0.45 : 0.35 },
+      },
+      vertexShader: `/* ringMaterial vertex shader */`,
+      fragmentShader: `/* ringMaterial fragment shader */`,
+    });
+
+    materialRef.current = mat;
+    return mat;
+  }, [seed, color, quality]);
 
   useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (meshRef.current) meshRef.current.rotation.z += 0.0006; // 稳定慢转
-    if (matRef.current) matRef.current.uniforms.uTime.value = t;
+    if (meshRef.current) meshRef.current.rotation.z += 0.0006;
+    if (materialRef.current) {
+      materialRef.current.uniforms.uTime.value = state.clock.getElapsedTime();
+    }
   });
 
   if (!config.ring.enabled) return null;
@@ -37,17 +59,7 @@ export const RingLayer: React.FC<RingLayerProps> = ({
           q.ringSegments,
         ]}
       />
-      <ringMaterial
-        ref={matRef}
-        transparent
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-        uSeed={seed}
-        uColor={color}
-        uIntensity={0.55 + Math.min(1, config.atmosphereIntensity) * 0.55}
-        uBandFreq={quality === "high" ? 56.0 : quality === "mid" ? 46.0 : 38.0}
-        uGrainStrength={quality === "high" ? 0.45 : 0.35}
-      />
+      <primitive attach="material" object={material} />
     </mesh>
   );
 };
