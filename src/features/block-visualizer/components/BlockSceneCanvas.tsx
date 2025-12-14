@@ -1,4 +1,4 @@
-﻿import React, { Suspense, useMemo } from "react";
+import React, { Suspense, useCallback, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import {
@@ -9,11 +9,13 @@ import {
 } from "@react-three/postprocessing";
 import { ToneMappingMode } from "postprocessing";
 
-import type { PlanetConfig } from "../types";
+import type { BlockBasic, PlanetConfig, TransactionInfo } from "../types";
 import { BlockPlanet } from "./BlockPlanet";
 
 interface BlockSceneCanvasProps {
   planet: PlanetConfig;
+  block?: BlockBasic;
+  transactions?: TransactionInfo[];
   quality?: "low" | "mid" | "high";
 }
 
@@ -34,13 +36,19 @@ function Effects() {
 
 export const BlockSceneCanvas: React.FC<BlockSceneCanvasProps> = ({
   planet,
+  block,
+  transactions,
   quality = "high",
 }) => {
   const blockKey = useMemo(() => {
-    const bn = (planet as any).blockNumber ?? (planet as any).blockNo ?? "";
-    const seed = (planet as any).visualSeed ?? "";
+    const bn =
+      block?.number ??
+      (planet as any).blockNumber ??
+      (planet as any).blockNo ??
+      "";
+    const seed = block?.hash ?? (planet as any).visualSeed ?? "";
     return `${bn}-${seed}-${planet.radius.toFixed(3)}`;
-  }, [planet]);
+  }, [block, planet]);
 
   return (
     <div className="relative w-full h-full">
@@ -70,8 +78,12 @@ export const BlockSceneCanvas: React.FC<BlockSceneCanvasProps> = ({
         />
 
         <Suspense fallback={null}>
-          <group rotation={[0.35, 0.65, 0]}>
-            <BlockPlanet config={planet} quality={quality} />
+          <group rotation={[0.35, 0.65, 0]} key={blockKey}>
+            <BlockPlanet
+              config={planet}
+              quality={quality}
+              transactions={transactions}
+            />
           </group>
 
           <OrbitControls
@@ -82,7 +94,7 @@ export const BlockSceneCanvas: React.FC<BlockSceneCanvasProps> = ({
             maxDistance={Math.max(18, planet.radius * 7)}
           />
 
-          {/* ✅ bloom/ACES/暗角 可实时调 */}
+          {/* ? bloom/ACES/暗角 可实时调 */}
           <Effects />
         </Suspense>
       </Canvas>

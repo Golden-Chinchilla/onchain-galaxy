@@ -1,4 +1,12 @@
 ﻿// 区块基础数据（之后可以接 viem/ethers 真数据）
+export interface TransactionInfo {
+  hash: string;
+  from?: string;
+  to?: string;
+  value?: bigint;
+  gasUsed?: bigint;
+}
+
 export interface BlockBasic {
   number: number;
   hash: string;
@@ -13,6 +21,7 @@ export interface BlockBasic {
   totalDifficulty?: bigint;
   parentHash?: string;
   era?: "pow" | "pos";
+  transactions: TransactionInfo[];
 }
 
 // 区块 → 星球可视化配置

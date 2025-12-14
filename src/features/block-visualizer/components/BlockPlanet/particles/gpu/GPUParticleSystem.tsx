@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame, useThree } from "@react-three/fiber";
 import { createPositionTexture } from "./createDataTexture";
@@ -170,6 +170,34 @@ export const GPUParticleSystem: React.FC<GPUParticleSystemProps> = ({
     scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), historyMat));
     return { scene, cam };
   }, [historyMat]);
+
+  // 当分辨率/历史长度变化时，重置 ping-pong，避免沿用旧 RT 导致轨迹污染
+  useEffect(() => {
+    const oldRTs = [
+      simPing.current,
+      simPong.current,
+      histPing.current,
+      histPong.current,
+    ];
+
+    simPing.current = simA;
+    simPong.current = simB;
+    histPing.current = histA;
+    histPong.current = histB;
+    initDone.current = false;
+
+    oldRTs.forEach((rt) => {
+      if (
+        rt &&
+        rt !== simA &&
+        rt !== simB &&
+        rt !== histA &&
+        rt !== histB
+      ) {
+        rt.dispose();
+      }
+    });
+  }, [simA, simB, histA, histB, texSize, safeHistoryLen]);
 
   // --- lineSegments geometry (subsample particles & segments) ---
   const linesGeometry = useMemo(() => {

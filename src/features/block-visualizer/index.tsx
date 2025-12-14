@@ -74,7 +74,13 @@ export const BlockVisualizer: React.FC = () => {
   return (
     <div className="w-full h-full flex gap-4">
       <div className="flex-1 min-h-[480px] max-h-[720px]">
-        {current && <BlockSceneCanvas planet={current.planet} />}
+        {current && (
+          <BlockSceneCanvas
+            planet={current.planet}
+            block={current.block}
+            transactions={current.block.transactions}
+          />
+        )}
       </div>
 
       <div className="w-[320px] flex flex-col">

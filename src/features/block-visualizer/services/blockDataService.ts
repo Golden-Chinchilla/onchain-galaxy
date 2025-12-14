@@ -1,6 +1,6 @@
 ﻿import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
-import type { BlockBasic } from "../types";
+import type { BlockBasic, TransactionInfo } from "../types";
 
 // ===== 1. 创建 PublicClient =====
 
@@ -19,10 +19,25 @@ const publicClient = createPublicClient({
 
 // ===== 2. 把 RPC 返回的区块映射成 BlockBasic =====
 
+function normalizeTransactions(raw: any): TransactionInfo[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((tx: any) => {
+    if (typeof tx === "string") {
+      return { hash: tx };
+    }
+    return {
+      hash: tx.hash,
+      from: tx.from,
+      to: tx.to,
+      value: tx.value,
+      gasUsed: tx.gasUsed,
+    };
+  });
+}
+
 function mapBlockResponseToBasic(block: any): BlockBasic {
-  const txCount = Array.isArray(block.transactions)
-    ? block.transactions.length
-    : 0n;
+  const transactions = normalizeTransactions(block.transactions);
+  const txCount = transactions.length;
 
   const number = Number(block.number);
 
@@ -42,6 +57,7 @@ function mapBlockResponseToBasic(block: any): BlockBasic {
     totalDifficulty: block.totalDifficulty,
 
     era: number >= 15537393 ? "pos" : "pow", // Merge 之后算 PoS
+    transactions,
   };
 }
 

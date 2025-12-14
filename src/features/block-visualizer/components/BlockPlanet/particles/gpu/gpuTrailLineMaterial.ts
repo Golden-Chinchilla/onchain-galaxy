@@ -74,11 +74,11 @@ export function createTrailLineMaterial(color: string) {
         vec3 p0 = sampleHistory(vUv, max(0.0, vSlice - 1.0));
         float segLen = length(p1 - p0);
 
-        float lenFactor = clamp(1.0 - segLen / uMaxJump, 0.0, 1.0);
+        // 长度衰减：在阈值附近平滑过渡，避免硬截断带来的大片空洞
+        float lenFactor = 1.0 - smoothstep(uMaxJump * 0.6, uMaxJump, segLen);
 
         float a = pow(1.0 - vAge, 1.6) * uIntensity * lenFactor;
         a = clamp(a, 0.0, 0.9);
-        if (a <= 0.0) discard;
         gl_FragColor = vec4(uColor, a);
       }
     `,
